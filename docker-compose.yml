@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    # Requisito: Usar la imagen base mariadb:latest
+    image: mariadb:latest
+    environment:
+      # Requisito: Usar el valor de la variable ROOT_PASSWORD en MARIADB_ROOT_PASSWORD
+      MARIADB_ROOT_PASSWORD: ${ROOT_PASSWORD}
+    # Requisito: El puerto NO debe estar expuesto al host (no añadimos sección 'ports')
+    deploy:
+      resources:
+        limits:
+          # Requisito: Configura un límite de consumo de memoria en 512 MB
+          memory: 512M
+
+  web:
+    # Requisito: Indica que se construya usando el fichero Dockerfile
+    build: .
+    ports:
+      # Requisito: Mapea el puerto 80 del contenedor con el puerto 80[DNI2] del host
+      # IMPORTANTE: Cambia el '78' por tus dos últimas cifras reales del DNI
+      - "8078:80"
+    environment:
+      ROOT_PASSWORD: ${ROOT_PASSWORD}
+    depends_on:
+      - db
+    security_opt:
+      # Requisito: Activa la opción de seguridad para evitar escalada de privilegios
+      - no-new-privileges:true
